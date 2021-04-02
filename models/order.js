@@ -4,33 +4,31 @@ const Schema = mongoose.Schema;
 
 // creating user schema
 let orderSchema = new Schema({
-    orderId: new Schema.Types.ObjectId,
+
     userId: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'user'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users'
     },
     productId: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'product'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'products'
     },
+
     orderDate: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     },
-    delivaryDate: {
-        type: Date,
-        required: true
-    },
+
     totalPrice: {
         type: Number,
         required: true
-    },
-
-    delivaryAddress: {
-        type: String,
-        max: [100]
     }
 
+
+
+}, {
+    collection: "orders"
 });
 
 // Create model from the order schema

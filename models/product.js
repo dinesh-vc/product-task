@@ -5,17 +5,18 @@ const Schema = mongoose.Schema;
 // creating product schema
 
 let productSchema = new Schema({
-    productId: new Schema.Types.ObjectId,
+
     userId: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'user'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users'
     },
     productName: {
         type: String,
         required: true
     },
-    category: {
-        type: String,
+
+    quantity: {
+        type: Number,
         required: true
     },
     price: {
@@ -25,9 +26,12 @@ let productSchema = new Schema({
 
     productDate: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     }
 
+}, {
+    collection: "products"
 });
 
 // Create model from the product schema
