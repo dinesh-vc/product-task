@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 // creating user schema
 let userSchema = new Schema({
-    userId: Schema.Types.ObjectId,
+
     firstName: {
         type: String,
         required: true
@@ -36,7 +36,7 @@ let userSchema = new Schema({
 });
 
 // Create model from the order schema
-const userAccount = mongoose.model("users", userSchema);
+const users = mongoose.model("users", userSchema);
 
 // exporting user module
-module.exports = user;
+module.exports = users;
