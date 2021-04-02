@@ -22,14 +22,9 @@ let productSchema = new Schema({
     price: {
         type: Number,
         required: true
-    },
-
-    productDate: {
-        type: Date,
-        required: true,
-        default: Date.now
     }
-
+}, {
+    timestamps: true,
 }, {
     collection: "products"
 });

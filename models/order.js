@@ -14,12 +14,6 @@ let orderSchema = new Schema({
         ref: 'products'
     },
 
-    orderDate: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
-
     totalPrice: {
         type: Number,
         required: true
@@ -27,6 +21,8 @@ let orderSchema = new Schema({
 
 
 
+}, {
+    timestamps: true,
 }, {
     collection: "orders"
 });
