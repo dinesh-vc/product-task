@@ -32,7 +32,7 @@ let orderSchema = new Schema({
 });
 
 // Create model from the order schema
-const order = mongoose.model("orders", orderSchema);
+const orders = mongoose.model("orders", orderSchema);
 
 // Exporting Order Module
-module.exports = order;
+module.exports = orders;
