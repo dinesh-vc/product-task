@@ -2,20 +2,68 @@
 
 <head>
     <title>Sell and Buy</title>
-</head>
-<h1 ALIGN="CENTER">Welcome <%=firstName%> </h1>
-<h2 ALIGN="CENTER"> Select Below Option</h2>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
 
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<h1 ALIGN="CENTER"> Welcome <%= firstName %></h1>
 <div ALIGN="CENTER">
-    <form  action="/user/sell" method="POST">
-        <input name="Submit" type="Submit" value="Sell Product"/>
-     </form>
-     
-     <form  action="/user/buy" method="POST"></form>
-     <input name="Submit" type="Submit" value="Buy Product"/>
-     
-     </form>
-     
+
+    <form action="/login/buy" method="POST">
+        <input name="Submit" type="Submit" value="Buy Product" />
+    </form>
+    <form action="/login/sell" method="POST">
+        <input name="Submit" type="Submit" value="Sell Product" />
+    </form>
+   
+
+    <h2>List of Avaible Product</h2>
+
+    <table>
+        <tr>
+            <th>User Id</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Edit</th>
+            <th>Delete</th>
+            <th>Buy</th>
+        </tr>
+        <% allProduct.forEach(allProducts => { %>
+        <tr>
+            <td><%= allProducts.userId %></td>
+            <td><%= allProducts.productName %></td>
+            <td><%= allProducts.quantity %></td>
+            <td><%= allProducts.price %></td>
+            <td> <input name="Submit" type="Submit" value="Edit" /></td>
+            <td> <input name="Submit" type="Submit" value="Delete" /></td>
+            <td>
+                <form action="/login/buy" method="POST">
+                    <input name="Submit" type="Submit" value="Buy Product" />
+                </form>
+            </td>
+
+        </tr>
+        <% }) %>
+    </table>
+
 </div>
+
+
 
 </html>

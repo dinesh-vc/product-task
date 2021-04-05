@@ -11,13 +11,14 @@ exports.login = async (req, res) => {
     try {
         let email = req.body.email;
         let password = req.body.password;
+
         // checking user data in database
 
         const userInfo = await user.findOne({
             email: email
         })
 
-userId=userInfo._id;
+        userId = userInfo._id;
         //  compare user passwor with stored hash password
         let comparedPassword = await bcrypt.compare(password, userInfo.password);
 
@@ -25,7 +26,10 @@ userId=userInfo._id;
 
         if (email === userInfo.email && comparedPassword) {
 
+
+            const allProduct = await product.find({});
             res.render("home", {
+                allProduct: allProduct,
                 firstName: userInfo.firstName
             })
 
@@ -80,7 +84,7 @@ exports.sell = (req, res) => {
 exports.addProduct = async (req, res) => {
     try {
         const newProduct = new product({
-            userId : userId,
+            userId: userId,
             productName: req.body.productName,
             quantity: req.body.quantity,
             price: req.body.price,
@@ -93,4 +97,10 @@ exports.addProduct = async (req, res) => {
     } catch (error) {
         console.log(error)
     }
+}
+
+exports.buy = (req, res) => {
+    
+    
+
 }

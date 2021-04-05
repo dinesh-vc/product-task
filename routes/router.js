@@ -8,18 +8,16 @@ route.get("/register", (req, res) => {
     res.render("register")
 })
 
-
 route.get("/login", (req, res) => {
     res.render("login")
 })
 
 route.post("/login" , controller.login);
-
 route.post("/register" , controller.register);
+route.post("/login/sell" , controller.sell);
+route.post("/login/sell/product" , controller.addProduct);
+route.post("/login/buy" , controller.buy);
 
-route.post("/user/sell" , controller.sell);
-
-route.post("/user/sell/product" , controller.addProduct);
 
 
 module.exports = route;
