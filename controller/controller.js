@@ -2,10 +2,23 @@ const user = require("../models/user");
 const product = require("../models/product")
 const order = require("../models/order");
 
+// Import Bycrpt module for password hasing
 const bcrypt = require('bcrypt')
+
 
 let userId;
 
+
+// Rendering LoginForm
+exports.loginForm = (req, res) => {
+    res.render("login")
+}
+
+// rendring Registration Form
+exports.registerForm = (req, res) => {
+    res.render("register")
+}
+// login request
 exports.login = async (req, res) => {
 
     try {
@@ -47,14 +60,7 @@ exports.login = async (req, res) => {
 
     }
 };
-
-exports.loginForm = (req, res) => {
-    res.render("login")
-}
-exports.registerForm = (req, res) => {
-    res.render("register")
-}
-
+// regisration request
 exports.register = async (req, res) => {
     try {
 
@@ -87,11 +93,11 @@ exports.register = async (req, res) => {
         console.log(error)
     }
 }
-
+// Rendering Selling Form
 exports.sell = (req, res) => {
     res.render("sell")
 }
-
+// Adding New Product
 exports.addProduct = async (req, res) => {
     try {
 
@@ -122,6 +128,7 @@ exports.addProduct = async (req, res) => {
     }
 }
 
+// Buying New Product
 exports.buy = async (req, res) => {
 
     let productList = await product.find({});
@@ -131,6 +138,7 @@ exports.buy = async (req, res) => {
     })
 
 }
+// Show Order History
 exports.order = async (req, res) => {
     try {
         let userDetail = await user.findOne({
@@ -149,7 +157,6 @@ exports.order = async (req, res) => {
         } else {
 
             availableQuantity = productDetail.quantity;
-            console.log(availableQuantity);
 
             if (availableQuantity >= quantity) {
 
@@ -203,3 +210,63 @@ exports.order = async (req, res) => {
         console.log(error)
     }
 }
+// Edit Product Detail Request
+exports.edit = async (req, res) => {
+
+    let productId = req.params.id;
+
+    let editProduct = await product.findOne({
+        _id: productId
+    });
+
+    res.render("editProduct", {
+        editProduct
+    })
+
+
+}
+// Storing Product updated Detail
+exports.editProduct = async (req, res)=> {
+
+    let productName = req.body.productName;
+
+    let updateProduct = await product.updateOne({
+        productName: productName
+    }, {
+        $set: {
+            productName: productName,
+            quantity: req.body.quantity,
+            price: req.body.price
+        }
+    })
+
+    let productList = await product.find({});
+
+    let userInfo = await user.findOne({
+        _id: userId
+    })
+
+    res.render("home", {
+        productList: productList,
+        firstName: userInfo.firstName
+    })
+    
+   
+}
+// Deletting Product
+exports.delete=async(req,res)=>{
+    let productId=req.params.id;
+    let deleteProduct= await product.deleteOne({_id:productId});
+    let productList = await product.find({});
+
+    let userInfo = await user.findOne({
+        _id: userId
+    })
+
+    res.render("home", {
+        productList: productList,
+        firstName: userInfo.firstName
+    })
+    
+    
+    }

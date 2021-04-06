@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Sell and Buy</title>
+    <title>My Order</title>
     <style>
         table {
             font-family: arial, sans-serif;
@@ -24,12 +24,12 @@
 <h1 ALIGN="CENTER"> Welcome <%=userDetail.firstName %></h1>
 <div ALIGN="CENTER">
 
-    <form action="/login/dashboard/sell" method="POST">
+    <form action="/sell" method="POST">
         <input name="Submit" type="Submit" value="Sell Product" />
     </form>
 
 
-        <form action="/login/dashboard/buy" method="POST">
+        <form action="/buy" method="POST">
             <input name="Submit" type="Submit" value="Buy Product" />
         </form>
 

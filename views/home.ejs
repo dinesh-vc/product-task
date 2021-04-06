@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Sell and Buy</title>
+    <title>Dashboard</title>
     <style>
         table {
             font-family: arial, sans-serif;
@@ -24,14 +24,14 @@
 <h1 ALIGN="CENTER"> Welcome <%=firstName %> </h1>
 <div ALIGN="CENTER">
 
-    <form action="/login/dashboard/sell" method="POST">
+    <form action="/sell" method="POST">
         <input name="Submit" type="Submit" value="Sell Product" />
     </form>
 
 
-        <form action="/login/dashboard/buy" method="POST">
-            <input name="Submit" type="Submit" value="Buy Product" />
-        </form>
+    <form action="/buy" method="POST">
+        <input name="Submit" type="Submit" value="Buy Product" />
+    </form>
 
     <h2>List of Available Product</h2>
 
@@ -41,8 +41,10 @@
             <th>Product Name</th>
             <th>Quantity</th>
             <th>Price</th>
-          
-            
+            <th>Edit</th>
+            <th>Delete</th>
+
+
         </tr>
         <% productList.forEach(allProducts => { %>
         <tr>
@@ -50,7 +52,9 @@
             <td><%= allProducts.productName %></td>
             <td><%= allProducts.quantity %></td>
             <td><%= allProducts.price %></td>
-        
+            <td><a href="/edit/<%= allProducts._id %>">Edit</a></td>
+            <td><a href="/delete/<%= allProducts._id %>">Delete</a></td>
+
             </td>
         </tr>
         <% }) %>

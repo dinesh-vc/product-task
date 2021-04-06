@@ -1,15 +1,35 @@
 const express = require('express')
 const route = express.Router();
 
-const controller= require('../Controller/controller')
+// import controller File
+const controller = require('../Controller/controller')
 
-route.get("/register" , controller.registerForm )
-route.get("/login" , controller.loginForm )
-route.post("/login/dashboard" , controller.login);
-route.post("/register" , controller.register);
-route.post("/login/dashboard/sell" , controller.sell);
-route.post("/login/dashboard/sell/product" , controller.addProduct);
-route.post("/login/dashboard/buy" , controller.buy);
-route.post("/login/dashboard/buy/my-order" , controller.order)
+// get request for login and registration
+route.get("/register", controller.registerForm)
+route.get("/login", controller.loginForm)
 
+// Login and Registration post Request
+route.post("/login", controller.login);
+route.post("/register", controller.register);
+
+
+// Ṣell product request
+route.post("/sell", controller.sell);
+route.post("/sell/product", controller.addProduct);
+
+// Buy Product Request
+route.post("/buy", controller.buy);
+
+// Show Order Histroy Request
+route.post("/order", controller.order)
+
+// Edit product Request
+route.get("/edit/:id", controller.edit);
+route.post("/editProduct", controller.editProduct);
+
+// Delete Product Request
+route.get("/delete/:id", controller.delete);
+
+
+// expotering module
 module.exports = route;
