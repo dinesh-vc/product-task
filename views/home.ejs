@@ -27,34 +27,31 @@
     <form action="/sell" method="POST">
         <input name="Submit" type="Submit" value="Sell Product" />
     </form>
-
-
-    <form action="/buy" method="POST">
-        <input name="Submit" type="Submit" value="Buy Product" />
+    <form action="/history" method="POST">
+        <input name="Submit" type="Submit" value="Order History" />
     </form>
 
     <h2>List of Available Product</h2>
 
     <table>
         <tr>
-            <th>User Id</th>
             <th>Product Name</th>
             <th>Quantity</th>
             <th>Price</th>
             <th>Edit</th>
             <th>Delete</th>
+            <th>Buy</th>
 
 
         </tr>
         <% productList.forEach(allProducts => { %>
         <tr>
-            <td><%= allProducts.userId %></td>
             <td><%= allProducts.productName %></td>
             <td><%= allProducts.quantity %></td>
             <td><%= allProducts.price %></td>
             <td><a href="/edit/<%= allProducts._id %>">Edit</a></td>
             <td><a href="/delete/<%= allProducts._id %>">Delete</a></td>
-
+            <td><a href="/buy/<%= allProducts._id %>">Buy</a></td>
             </td>
         </tr>
         <% }) %>

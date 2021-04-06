@@ -4,10 +4,7 @@ const order = require("../models/order");
 
 // Import Bycrpt module for password hasing
 const bcrypt = require('bcrypt')
-
-
 let userId;
-
 
 // Rendering LoginForm
 exports.loginForm = (req, res) => {
@@ -63,32 +60,36 @@ exports.login = async (req, res) => {
 // regisration request
 exports.register = async (req, res) => {
     try {
-
-        let password = req.body.password;
-        let confirmPassword = req.body.confirmPassword;
-
-        if (password === confirmPassword) {
-            const salt = await bcrypt.genSalt(10);
-            // now we set user password to hashed password
-            password = await bcrypt.hash(password, salt);
-
-            const userRegistration = new user({
-                firstName: req.body.firstname,
-                lastName: req.body.lastname,
-                phoneNumber: req.body.phone,
-                email: req.body.email,
-                address: req.body.address,
-                password: password
-
-            })
-
-            const registred = await userRegistration.save();
-            res.render("login")
-
+        let email = req.body.email;
+        let userInfo = await user.findOne({
+            email: email
+        })
+        if (userInfo) {
+            res.send(`Someone is already registed with ${email} !! Please Register With Another Mail Id !!!!`)
         } else {
-            res.send("Password are not matching")
-        }
+            let password = req.body.password;
+            let confirmPassword = req.body.confirmPassword;
 
+            if (password === confirmPassword) {
+                const salt = await bcrypt.genSalt(10);
+                // now we set user password to hashed password
+                password = await bcrypt.hash(password, salt);
+
+                const userRegistration = new user({
+                    firstName: req.body.firstname,
+                    lastName: req.body.lastname,
+                    phoneNumber: req.body.phone,
+                    email: req.body.email,
+                    address: req.body.address,
+                    password: password
+                })
+
+                const registred = await userRegistration.save();
+                res.render("login")
+            } else {
+                res.send("Password are not matching")
+            }
+        }
     } catch (error) {
         console.log(error)
     }
@@ -130,15 +131,18 @@ exports.addProduct = async (req, res) => {
 
 // Buying New Product
 exports.buy = async (req, res) => {
+    let productId = req.params.id;
 
-    let productList = await product.find({});
-
+    let productList = await product.find({
+        _id: productId
+    });
+    console.log(productList)
     res.render("buy", {
-        productList
+        x: productList.productName
     })
 
 }
-// Show Order History
+// Placeing Order
 exports.order = async (req, res) => {
     try {
         let userDetail = await user.findOne({
@@ -210,6 +214,28 @@ exports.order = async (req, res) => {
         console.log(error)
     }
 }
+// Showing Order History
+exports.history = async (req, res) => {
+    try {
+        let userDetail = await user.findOne({
+            _id: userId
+        });
+
+        let orderSummary = await order.find({
+            userId: userId
+        });
+
+        res.render("myOrder", {
+            orderSummary,
+            userDetail
+
+        })
+
+
+    } catch (error) {
+        console.log(error)
+    }
+}
 // Edit Product Detail Request
 exports.edit = async (req, res) => {
 
@@ -226,15 +252,15 @@ exports.edit = async (req, res) => {
 
 }
 // Storing Product updated Detail
-exports.editProduct = async (req, res)=> {
+exports.editProduct = async (req, res) => {
 
-    let productName = req.body.productName;
+    let productId = req.body.productId;
 
     let updateProduct = await product.updateOne({
-        productName: productName
+        _id: productId
     }, {
         $set: {
-            productName: productName,
+            productName: req.body.productName,
             quantity: req.body.quantity,
             price: req.body.price
         }
@@ -250,13 +276,15 @@ exports.editProduct = async (req, res)=> {
         productList: productList,
         firstName: userInfo.firstName
     })
-    
-   
+
+
 }
 // Deletting Product
-exports.delete=async(req,res)=>{
-    let productId=req.params.id;
-    let deleteProduct= await product.deleteOne({_id:productId});
+exports.delete = async (req, res) => {
+    let productId = req.params.id;
+    let deleteProduct = await product.deleteOne({
+        _id: productId
+    });
     let productList = await product.find({});
 
     let userInfo = await user.findOne({
@@ -267,6 +295,6 @@ exports.delete=async(req,res)=>{
         productList: productList,
         firstName: userInfo.firstName
     })
-    
-    
-    }
+
+
+}

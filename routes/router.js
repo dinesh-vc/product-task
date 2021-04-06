@@ -9,7 +9,7 @@ route.get("/register", controller.registerForm)
 route.get("/login", controller.loginForm)
 
 // Login and Registration post Request
-route.post("/login", controller.login);
+route.post("/login/dashboard", controller.login);
 route.post("/register", controller.register);
 
 
@@ -18,10 +18,13 @@ route.post("/sell", controller.sell);
 route.post("/sell/product", controller.addProduct);
 
 // Buy Product Request
-route.post("/buy", controller.buy);
+route.get("/buy/:id", controller.buy);
 
 // Show Order Histroy Request
 route.post("/order", controller.order)
+
+// Show Order Histroy Request
+route.post("/history", controller.history)
 
 // Edit product Request
 route.get("/edit/:id", controller.edit);

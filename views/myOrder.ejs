@@ -28,16 +28,11 @@
         <input name="Submit" type="Submit" value="Sell Product" />
     </form>
 
-
-        <form action="/buy" method="POST">
-            <input name="Submit" type="Submit" value="Buy Product" />
-        </form>
-
     <h2>My Order</h2>
 
     <table>
         <tr>
-            <th>Product id</th>
+
             <th>Product Name</th>
             <th>Quantity</th>
             <th>Total Price</th>
@@ -46,7 +41,7 @@
         </tr>
         <% orderSummary.forEach(myOrder => { %>
         <tr>
-            <td><%= myOrder.productId %></td>
+         
             <td><%= myOrder.productName %></td>
             <td><%= myOrder.quantity %></td>
             <td><%= myOrder.totalPrice %></td>
