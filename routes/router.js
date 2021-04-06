@@ -3,21 +3,13 @@ const route = express.Router();
 
 const controller= require('../Controller/controller')
 
-
-route.get("/register", (req, res) => {
-    res.render("register")
-})
-
-route.get("/login", (req, res) => {
-    res.render("login")
-})
-
-route.post("/login" , controller.login);
+route.get("/register" , controller.registerForm )
+route.get("/login" , controller.loginForm )
+route.post("/login/dashboard" , controller.login);
 route.post("/register" , controller.register);
-route.post("/login/sell" , controller.sell);
-route.post("/login/sell/product" , controller.addProduct);
-route.post("/login/buy" , controller.buy);
-
-
+route.post("/login/dashboard/sell" , controller.sell);
+route.post("/login/dashboard/sell/product" , controller.addProduct);
+route.post("/login/dashboard/buy" , controller.buy);
+route.post("/login/dashboard/buy/my-order" , controller.order)
 
 module.exports = route;

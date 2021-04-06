@@ -14,27 +14,31 @@ exports.login = async (req, res) => {
 
         // checking user data in database
 
-        const userInfo = await user.findOne({
+        let userInfo = await user.findOne({
             email: email
         })
 
-        userId = userInfo._id;
-        //  compare user passwor with stored hash password
-        let comparedPassword = await bcrypt.compare(password, userInfo.password);
-
-        // checking mail and password is correct or not
-
-        if (email === userInfo.email && comparedPassword) {
-
-
-            const allProduct = await product.find({});
-            res.render("home", {
-                allProduct: allProduct,
-                firstName: userInfo.firstName
-            })
-
+        if (!userInfo) {
+            res.send("Please Register First !!")
         } else {
-            res.send("Username and Password Invalid !!!")
+            userId = userInfo._id;
+            //  compare user passwor with stored hash password
+            let comparedPassword = await bcrypt.compare(password, userInfo.password);
+
+            // checking mail and password is correct or not
+
+            if (email === userInfo.email && comparedPassword) {
+
+
+                let productList = await product.find({});
+                res.render("home", {
+                    productList: productList,
+                    firstName: userInfo.firstName
+                })
+
+            } else {
+                res.send("Username and Password Invalid !!!")
+            }
         }
 
     } catch (error) {
@@ -43,6 +47,13 @@ exports.login = async (req, res) => {
 
     }
 };
+
+exports.loginForm = (req, res) => {
+    res.render("login")
+}
+exports.registerForm = (req, res) => {
+    res.render("register")
+}
 
 exports.register = async (req, res) => {
     try {
@@ -66,7 +77,7 @@ exports.register = async (req, res) => {
             })
 
             const registred = await userRegistration.save();
-            res.send(` ${req.body.firstname}  Registred Succesfully !!!`);
+            res.render("login")
 
         } else {
             res.send("Password are not matching")
@@ -83,6 +94,7 @@ exports.sell = (req, res) => {
 
 exports.addProduct = async (req, res) => {
     try {
+
         const newProduct = new product({
             userId: userId,
             productName: req.body.productName,
@@ -92,15 +104,102 @@ exports.addProduct = async (req, res) => {
         })
 
         const addingProduct = await newProduct.save();
-        res.send(` ${req.body.productName}  Added Succesfully !!!`);
+
+        let userInfo = await user.findOne({
+            _id: userId
+        })
+
+        let productList = await product.find({});
+
+        res.render("home", {
+            productList: productList,
+            firstName: userInfo.firstName
+        })
+
 
     } catch (error) {
         console.log(error)
     }
 }
 
-exports.buy = (req, res) => {
-    
-    
+exports.buy = async (req, res) => {
 
+    let productList = await product.find({});
+
+    res.render("buy", {
+        productList
+    })
+
+}
+exports.order = async (req, res) => {
+    try {
+        let userDetail = await user.findOne({
+            _id: userId
+        });
+
+        let productName = req.body.productName;
+        let quantity = req.body.quantity;
+
+        let productDetail = await product.findOne({
+            productName
+        });
+
+        if (!productDetail) {
+            res.send("Product is not avaible");
+        } else {
+
+            availableQuantity = productDetail.quantity;
+            console.log(availableQuantity);
+
+            if (availableQuantity >= quantity) {
+
+                let productId = productDetail._id;
+
+                let totalPrice = quantity * (productDetail.price)
+
+                const newOrder = new order({
+                    userId: userId,
+                    productId: productId,
+                    productName: productName,
+                    quantity: quantity,
+                    totalPrice: totalPrice
+
+                })
+
+                const orderDetail = await newOrder.save();
+
+                let orderSummary = await order.find({
+                    userId
+                });
+
+                remainQuantity = (availableQuantity - quantity);
+
+                const updateQuantity = product.findOneAndUpdate({
+                    productName: productName
+                }, {
+                    $set: {
+                        quantity: remainQuantity
+                    }
+                }, (err) => {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        console.log("Quantity updated Succesfuly")
+                    }
+                });
+
+                res.render("myOrder", {
+                    orderSummary,
+                    userDetail
+
+                })
+            } else {
+
+                res.send(`${quantity} is not available only left ${availableQuantity}`)
+            }
+        }
+
+    } catch (error) {
+        console.log(error)
+    }
 }

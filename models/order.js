@@ -13,9 +13,12 @@ let orderSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'products'
     },
+    productName: {
+        type: String
+    },
+
     quantity: {
-        type: Number,
-        default: 1
+        type: Number
     },
 
     totalPrice: {

@@ -21,7 +21,7 @@
         }
     </style>
 </head>
-<h1 ALIGN="CENTER"> Welcome <%=firstName %> </h1>
+<h1 ALIGN="CENTER"> Welcome <%=userDetail.firstName %></h1>
 <div ALIGN="CENTER">
 
     <form action="/login/dashboard/sell" method="POST">
@@ -33,23 +33,23 @@
             <input name="Submit" type="Submit" value="Buy Product" />
         </form>
 
-    <h2>List of Available Product</h2>
+    <h2>My Order</h2>
 
     <table>
         <tr>
-            <th>User Id</th>
+            <th>Product id</th>
             <th>Product Name</th>
             <th>Quantity</th>
-            <th>Price</th>
+            <th>Total Price</th>
           
             
         </tr>
-        <% productList.forEach(allProducts => { %>
+        <% orderSummary.forEach(myOrder => { %>
         <tr>
-            <td><%= allProducts.userId %></td>
-            <td><%= allProducts.productName %></td>
-            <td><%= allProducts.quantity %></td>
-            <td><%= allProducts.price %></td>
+            <td><%= myOrder.productId %></td>
+            <td><%= myOrder.productName %></td>
+            <td><%= myOrder.quantity %></td>
+            <td><%= myOrder.totalPrice %></td>
         
             </td>
         </tr>
