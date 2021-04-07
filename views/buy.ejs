@@ -4,14 +4,14 @@
     <title> Buy </title>
 </head>
 
-<h2 ALIGN="CENTER">Select Quantity of <%=x %></h2>
+<h2 ALIGN="CENTER">Select Quantity of <%=productName %></h2>
 
 <form action="/order" method="POST">
     <table border="0" align="center">
         <tbody>
             <tr>
                 <td><label for="Select">Product Name:</label></td>
-                <td><input id="productName"  type="text" name="productName" value=<%=x %> >
+                <td><input id="productName" readonly  type="text" name="productName" value=<%=productName %> >
                 </td>
             </tr>
 

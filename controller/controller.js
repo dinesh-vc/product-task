@@ -137,8 +137,9 @@ exports.buy = async (req, res) => {
         _id: productId
     });
     console.log(productList)
+
     res.render("buy", {
-        x: productList.productName
+        productName : productList[0].productName
     })
 
 }
