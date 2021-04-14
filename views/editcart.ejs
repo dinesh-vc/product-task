@@ -1,0 +1,35 @@
+<html>
+<head>
+<title> Edit Product </title>
+</head>
+
+<h2 ALIGN="CENTER">Increment Or Decrement Quantity </h2>
+
+<form action="/cartEdit" method="POST">
+<table border="0" align="center">
+<tbody>
+
+    <tr>
+        <td><input  name="cartId"  hidden="true" value=<%=editCart._id %> /></td>
+    </tr>
+<tr>
+ 
+<td><label for="Product Name ">Product Name :</label></td>
+<td><input id="productName" readonly maxlength="50" name="productName" value=<%=editCart.productName %> /></td>
+</tr>
+
+<tr>
+    <td><label for="Quntity">Quantity :</label></td>
+    <td><input id="quantity"  name="quantity" value=<%=editCart.quantity %>  type="number" /></td>
+    </tr>
+
+<tr>
+    
+<tr>
+<td align="center"><input name="Submit" type="Submit" value="Edit Cart" /></td>
+</tr>
+
+</tbody>
+</table>
+</form>
+</html>

@@ -1,6 +1,7 @@
 const user = require("../models/user");
 const product = require("../models/product")
 const order = require("../models/order");
+const cart = require("../models/cart")
 
 // Import Bycrpt module for password hasing
 const bcrypt = require('bcrypt')
@@ -94,6 +95,20 @@ exports.register = async (req, res) => {
         console.log(error)
     }
 }
+
+exports.dashboard = async (req, res) => {
+
+    let productList = await product.find({});
+    let userInfo = await user.findOne({
+        _id: userId
+    })
+    res.render("home", {
+        productList: productList,
+        firstName: userInfo.firstName
+    })
+
+
+}
 // Rendering Selling Form
 exports.sell = (req, res) => {
     res.render("sell")
@@ -139,7 +154,7 @@ exports.buy = async (req, res) => {
     console.log(productList)
 
     res.render("buy", {
-        productName : productList[0].productName
+        productName: productList[0].productName
     })
 
 }
@@ -200,14 +215,21 @@ exports.order = async (req, res) => {
                     }
                 });
 
+                let total=0;
+
+                for ( let order of orderSummary){
+                    total= total + order.totalPrice;
+                }
+               
                 res.render("myOrder", {
                     orderSummary,
-                    userDetail
+                    userDetail,
+                    total
 
                 })
             } else {
 
-                res.send(`${quantity} is not available only left ${availableQuantity}`)
+                res.send(`${productName} Quantity ${quantity} is not available only left ${availableQuantity}`)
             }
         }
 
@@ -226,9 +248,16 @@ exports.history = async (req, res) => {
             userId: userId
         });
 
+        let total=0;
+
+        for ( let order of orderSummary){
+            total= total + order.totalPrice;
+        }
+
         res.render("myOrder", {
             orderSummary,
-            userDetail
+            userDetail,
+            total
 
         })
 
@@ -299,3 +328,324 @@ exports.delete = async (req, res) => {
 
 
 }
+
+
+// Adding New Product in Cart
+exports.cart = async (req, res) => {
+    let productId = req.params.id;
+
+    let productList = await product.findOne({
+        _id: productId
+    });
+    console.log(productList)
+
+    res.render("cart", {
+        productName: productList.productName
+    })
+
+}
+
+exports.myCartHistory = async (req, res) => {
+    let userDetail = await user.findOne({
+        _id: userId
+    });
+
+    let cartSummary = await cart.find({
+        userId: userId
+    });
+    res.render("mycart", {
+        cartSummary,
+        userDetail
+    })
+}
+
+exports.myCart = async (req, res) => {
+    try {
+        let userDetail = await user.findOne({
+            _id: userId
+        });
+
+        let productDetail = await product.findOne({
+            productName: req.body.productName
+        })
+
+        if (!productDetail) {
+            res.send("Cart is Empty !!!")
+        } else {
+            const newCart = new cart({
+                userId: userId,
+                productId: productDetail.productId,
+                productName: productDetail.productName,
+                quantity: req.body.quantity,
+                price: productDetail.price
+
+            })
+
+            const cartDetail = await newCart.save();
+            let cartSummary = await cart.find({
+                userId: userId
+            });
+            res.render("mycart", {
+                cartSummary,
+                userDetail
+            })
+        }
+
+
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+// Edit Product Detail Request
+exports.cartEdit = async (req, res) => {
+
+    let cartId = req.params.id;
+
+    let editCart = await cart.findOne({
+        _id: cartId
+    });
+
+    res.render("editCart", {
+        editCart
+    })
+
+
+}
+// Storing Product updated Detail
+exports.cartProduct = async (req, res) => {
+
+    let cartId = req.body.cartId;
+
+    let updatecart = await cart.updateOne({
+        _id: cartId
+    }, {
+        $set: {
+            quantity: req.body.quantity,
+
+        }
+    })
+
+    let cartSummary = await cart.find({});
+
+    let userDetail = await user.findOne({
+        _id: userId
+    })
+
+    res.render("mycart", {
+        cartSummary,
+        userDetail
+    })
+
+
+}
+
+// Deletting Product
+exports.cartDelete = async (req, res) => {
+    let cartId = req.params.id;
+    let deleteCart = await cart.deleteOne({
+        _id: cartId
+    });
+    let cartSummary = await cart.find({});
+    console.log(cartSummary)
+    let userDetail = await user.findOne({
+        _id: userId
+    })
+
+
+    res.render("mycart", {
+        cartSummary,
+        userDetail
+    })
+
+
+}
+
+
+// Buying New Product From Cart
+exports.cartBuy = async (req, res) => {
+
+
+    try {
+        let userDetail = await user.findOne({
+            _id: userId
+        });
+
+        let cartId = req.params.id;
+
+        let cartProduct = await cart.findOne({
+            _id: cartId
+        });
+
+        let productName = cartProduct.productName;
+        let quantity = cartProduct.quantity;
+
+        let productDetail = await product.findOne({
+            productName
+        });
+
+        if (!productDetail) {
+            res.send("Product is not avaible");
+        } else {
+
+            availableQuantity = productDetail.quantity;
+
+            if (availableQuantity >= quantity) {
+
+                let productId = productDetail._id;
+
+                let totalPrice = quantity * (productDetail.price)
+
+                const newOrder = new order({
+                    userId: userId,
+                    productId: productId,
+                    productName: productName,
+                    quantity: quantity,
+                    totalPrice: totalPrice
+
+                })
+
+                const orderDetail = await newOrder.save();
+
+                let orderSummary = await order.find({
+                    userId
+                });
+
+                remainQuantity = (availableQuantity - quantity);
+
+                const updateQuantity = product.findOneAndUpdate({
+                    productName: productName
+                }, {
+                    $set: {
+                        quantity: remainQuantity
+                    }
+                }, (err) => {
+                    if (err) {
+                        console.log(err)
+                    } else {
+
+                        console.log("Quantity updated Succesfuly")
+
+                    }
+                });
+
+                let deleteCart = await cart.deleteOne({
+                    _id: cartId
+                });
+                console.log(deleteCart)
+
+                res.render("myOrder", {
+                    orderSummary,
+                    userDetail
+
+                })
+            } else {
+
+                res.send(`${quantity} is not available only left ${availableQuantity}`)
+            }
+        }
+
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
+// Placeing Order
+exports.placeOrder = async (req, res) => {
+    try {
+
+        let cartProduct = await cart.find({
+            userId : userId
+        });
+        console.log(cartProduct)
+
+        let userDetail = await user.findOne({
+            _id: userId
+        });
+
+    
+        for (let cart of cartProduct) {
+
+            let productName = cart.productName;
+            let quantity = cart.quantity;
+
+            let productDetail = await product.findOne({
+              productName : productName
+            });
+
+         
+            if (!productDetail) {
+                res.send(`${productDetail.productName} Product is Not Availble `);
+            } else {
+
+                availableQuantity = productDetail.quantity;
+
+                if (availableQuantity >= quantity) {
+
+                    let productId = productDetail._id;
+
+                    let totalPrice = quantity * (productDetail.price)
+
+                    const newOrder = new order({
+                        userId: userId,
+                        productId: productId,
+                        productName: productName,
+                        quantity: quantity,
+                        totalPrice: totalPrice
+
+                    })
+
+                    const orderDetail = await newOrder.save();
+
+                    let orderSummary = await order.find({
+                        userId
+                    });
+
+                    remainQuantity = (availableQuantity - quantity);
+
+                    const updateQuantity = product.findOneAndUpdate({
+                        productName: productName
+                    }, {
+                        $set: {
+                            quantity: remainQuantity
+                        }
+                    }, (err) => {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            console.log("Quantity updated Succesfuly")
+                        }
+                    });
+
+            
+                    let deleteCart = await cart.deleteOne({
+                        _id: cart._id
+                    });
+
+                    let total=0;
+
+                    for ( let order of orderSummary){
+                        total= total + order.totalPrice;
+                    }
+
+                    res.render("myOrder", {
+                        orderSummary,
+                        userDetail,
+                        total
+
+                    } )
+                } else {
+
+                    res.send(`${productName} Quantity ${quantity} is not available only left ${availableQuantity}`)
+                }
+            }
+        }
+
+ 
+    } catch (error) {
+       res.send(error)
+    }
+}
+
+

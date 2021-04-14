@@ -1,0 +1,73 @@
+<html>
+
+<head>
+    <title>My Order</title>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<h1 ALIGN="CENTER"> Welcome <%=userDetail.firstName %></h1>
+<div ALIGN="CENTER">
+
+    <form action="/history " method="POST">
+        <input name="Submit" type="Submit" value="My Order" />
+    </form>
+
+    <form action="/dashboard " method="get">
+        <input name="Submit" type="Submit" value="Add More" />
+    </form>
+
+    <h2>My Cart</h2>
+
+    <table>
+        <tr>
+
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th> Price</th>
+            <th>Edit</th>
+            <th>Delete</th>
+            <th>Buy</th>
+
+        </tr>
+        <% cartSummary.forEach(cart => { %>
+        <tr>
+
+            <td><%= cart.productName %></td>
+            <td><%= cart.quantity %></td>
+            <td><%= cart.price %></td>
+            <td><a href="/cartEdit/<%= cart._id %>">Edit</a></td>
+            <td><a href="/cartDelete/<%= cart._id %>">Remove</a></td>
+            <td><a href="/cartBuy/<%= cart._id %>">Buy</a></td>
+            </td>
+        </tr>
+        <% }) %>
+    </table>
+<div>
+    <form action="/place-order " method="POST">
+        <input name="Submit" type="Submit" value="Place Order" />
+    </form>
+</div>
+   
+
+
+</div>
+
+
+
+</html>

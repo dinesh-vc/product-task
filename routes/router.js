@@ -12,7 +12,7 @@ route.get("/login", controller.loginForm)
 route.post("/login/dashboard", controller.login);
 route.post("/register", controller.register);
 
-
+route.get("/dashboard" , controller.dashboard)
 // Ṣell product request
 route.post("/sell", controller.sell);
 route.post("/sell/product", controller.addProduct);
@@ -32,6 +32,30 @@ route.post("/editProduct", controller.editProduct);
 
 // Delete Product Request
 route.get("/delete/:id", controller.delete);
+
+// Adding cart Product Request
+route.get("/cart/:id", controller.cart);
+
+route.get("/my-cart-history" , controller.myCartHistory)
+
+// Adding cart Product Request
+route.post("/my-cart", controller.myCart);
+
+// Edit product Request
+route.get("/cartEdit/:id", controller.cartEdit);
+route.post("/cartEdit", controller.cartProduct);
+
+// Delete Product Request
+route.get("/cartDelete/:id", controller.cartDelete);
+
+
+// Buying Product From Cart
+route.get("/cartBuy/:id", controller.cartBuy);
+
+
+// Buying Product From Cart
+route.post("/place-order", controller.placeOrder);
+
 
 
 // expotering module

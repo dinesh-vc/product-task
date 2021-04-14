@@ -1,0 +1,32 @@
+<html>
+
+<head>
+    <title> Buy </title>
+</head>
+
+<h2 ALIGN="CENTER">Select Quantity of <%=productName %></h2>
+
+<form action="/my-cart" method="POST">
+    <table border="0" align="center">
+        <tbody>
+            <tr>
+                <td><label for="Select">Product Name:</label></td>
+                <td><input id="productName" readonly  type="text" name="productName" value=<%=productName %> >
+                </td>
+            </tr>
+
+            <tr>
+                <td><label for="password">Quantity</label></td>
+                <td><input id="password" name="quantity" type="number" >
+                </td>
+            </tr>
+
+            <tr>
+                <td align="center"><input name="Submit" type="Submit" value="Add to Cart" /></td>
+            </tr>
+
+        </tbody>
+    </table>
+</form>
+
+</html>

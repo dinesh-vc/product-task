@@ -28,6 +28,14 @@
         <input name="Submit" type="Submit" value="Sell Product" />
     </form>
 
+    <form action="/my-cart-history" method="GET">
+        <input name="Submit" type="Submit" value="My Cart" />
+    </form>
+
+    <form action="/dashboard" method="GET">
+        <input name="Submit" type="Submit" value="Dashboard" />
+    </form>
+
     <h2>My Order</h2>
 
     <table>
@@ -50,9 +58,9 @@
         </tr>
         <% }) %>
     </table>
-
+  
 </div>
-
+<h1 ALIGN="CENTER"> Total Amount : <%= total %></h1>
 
 
 </html>

@@ -30,6 +30,9 @@
     <form action="/history" method="POST">
         <input name="Submit" type="Submit" value="Order History" />
     </form>
+    <form action="/my-cart-history" method="GET">
+        <input name="Submit" type="Submit" value="My Cart" />
+    </form>
 
     <h2>List of Available Product</h2>
 
@@ -40,6 +43,7 @@
             <th>Price</th>
             <th>Edit</th>
             <th>Delete</th>
+            <th>Add To Cart</th>
             <th>Buy</th>
 
 
@@ -51,6 +55,7 @@
             <td><%= allProducts.price %></td>
             <td><a href="/edit/<%= allProducts._id %>">Edit</a></td>
             <td><a href="/delete/<%= allProducts._id %>">Delete</a></td>
+            <td><a href="/cart/<%= allProducts._id %>">Add To Cart</a></td>
             <td><a href="/buy/<%= allProducts._id %>">Buy</a></td>
             </td>
         </tr>
