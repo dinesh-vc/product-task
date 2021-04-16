@@ -1,0 +1,37 @@
+<html>
+
+<head>
+    <title>Dashboard</title>
+  
+</head>
+
+<h1 ALIGN="CENTER"> Welcome <%=userDetail.firstName %> </h1>
+<div ALIGN="CENTER">
+    <img src="data:image/PNG;base64,<%=userDetail.userImg %>" height="100px" width="100px">
+</div>
+
+
+<div ALIGN="CENTER">
+
+    <h1>Your Order Placed Succesfully  !!!! </h1>
+
+    <h3>Thank you for Shooping !!!! </h3>
+
+    <form action="/sell" method="POST">
+        <input name="Submit" type="Submit" value="Sell Product" />
+    </form>
+    <form action="/history" method="POST">
+        <input name="Submit" type="Submit" value="Order History" />
+    </form>
+    <form action="/my-cart-history" method="GET">
+        <input name="Submit" type="Submit" value="My Cart" />
+    </form>
+
+  
+
+    
+</div>
+
+
+
+</html>

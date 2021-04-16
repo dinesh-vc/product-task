@@ -3,9 +3,16 @@ const product = require("../models/product")
 const order = require("../models/order");
 const cart = require("../models/cart")
 
+const fs = require('fs')
+
 // Import Bycrpt module for password hasing
 const bcrypt = require('bcrypt')
 let userId;
+let img;
+
+exports.homePage = (req, res) => {
+    res.render("homePage")
+}
 
 // Rendering LoginForm
 exports.loginForm = (req, res) => {
@@ -44,7 +51,7 @@ exports.login = async (req, res) => {
                 let productList = await product.find({});
                 res.render("home", {
                     productList: productList,
-                    firstName: userInfo.firstName
+                    userDetail: userInfo
                 })
 
             } else {
@@ -76,17 +83,31 @@ exports.register = async (req, res) => {
                 // now we set user password to hashed password
                 password = await bcrypt.hash(password, salt);
 
-                const userRegistration = new user({
-                    firstName: req.body.firstname,
-                    lastName: req.body.lastname,
-                    phoneNumber: req.body.phone,
-                    email: req.body.email,
-                    address: req.body.address,
-                    password: password
-                })
 
-                const registred = await userRegistration.save();
-                res.render("login")
+                let profileImg = await fs.readFile(req.body.profile, function (err, data) {
+                    if (err) {
+                        throw err;
+                    } else {
+                        profileImg = data.toString('base64');
+                        img = profileImg;
+                        const userRegistration = new user({
+                            firstName: req.body.firstname,
+                            lastName: req.body.lastname,
+                            phoneNumber: req.body.phone,
+                            email: req.body.email,
+                            address: req.body.address,
+                            userImg: profileImg,
+                            password: password
+                        })
+
+                        const registred = userRegistration.save();
+                        res.render("login")
+
+                    }
+                });
+
+                console.log(img)
+
             } else {
                 res.send("Password are not matching")
             }
@@ -104,7 +125,7 @@ exports.dashboard = async (req, res) => {
     })
     res.render("home", {
         productList: productList,
-        firstName: userInfo.firstName
+        userDetail: userInfo
     })
 
 
@@ -117,26 +138,35 @@ exports.sell = (req, res) => {
 exports.addProduct = async (req, res) => {
     try {
 
-        const newProduct = new product({
-            userId: userId,
-            productName: req.body.productName,
-            quantity: req.body.quantity,
-            price: req.body.price,
+        let profileImg = await fs.readFile(req.body.productImg, async function (err, data) {
+            if (err) {
+                throw err;
+            } else {
 
-        })
+                profileImg = data.toString('base64');
 
-        const addingProduct = await newProduct.save();
+                const newProduct = new product({
+                    userId: userId,
+                    productImg: profileImg,
+                    productName: req.body.productName,
+                    quantity: req.body.quantity,
+                    price: req.body.price,
 
-        let userInfo = await user.findOne({
-            _id: userId
-        })
+                })
+                const addingProduct = await newProduct.save();
+                let userInfo = user.findOne({
+                    _id: userId
+                })
 
-        let productList = await product.find({});
+                let productList = await product.find({});
 
-        res.render("home", {
-            productList: productList,
-            firstName: userInfo.firstName
-        })
+                res.render("home", {
+                    productList: productList,
+                    userDetail: userInfo
+                })
+
+            }
+        });
 
 
     } catch (error) {
@@ -188,6 +218,7 @@ exports.order = async (req, res) => {
                     userId: userId,
                     productId: productId,
                     productName: productName,
+                    productImg: productDetail.productImg,
                     quantity: quantity,
                     totalPrice: totalPrice
 
@@ -215,21 +246,21 @@ exports.order = async (req, res) => {
                     }
                 });
 
-                let total=0;
+                let total = 0;
 
-                for ( let order of orderSummary){
-                    total= total + order.totalPrice;
+                for (let order of orderSummary) {
+                    total = total + order.totalPrice;
                 }
-               
+
                 res.render("myOrder", {
                     orderSummary,
                     userDetail,
-                    total
+                    total,
 
                 })
             } else {
 
-                res.send(`${productName} Quantity ${quantity} is not available only left ${availableQuantity}`)
+                res.send(`  ${quantity} ${productName}is out of stock only left ${availableQuantity}`)
             }
         }
 
@@ -248,10 +279,10 @@ exports.history = async (req, res) => {
             userId: userId
         });
 
-        let total=0;
+        let total = 0;
 
-        for ( let order of orderSummary){
-            total= total + order.totalPrice;
+        for (let order of orderSummary) {
+            total = total + order.totalPrice;
         }
 
         res.render("myOrder", {
@@ -304,7 +335,7 @@ exports.editProduct = async (req, res) => {
 
     res.render("home", {
         productList: productList,
-        firstName: userInfo.firstName
+        userDetail: userInfo
     })
 
 
@@ -323,7 +354,7 @@ exports.delete = async (req, res) => {
 
     res.render("home", {
         productList: productList,
-        firstName: userInfo.firstName
+        userDetail: userInfo
     })
 
 
@@ -337,15 +368,19 @@ exports.cart = async (req, res) => {
     let productList = await product.findOne({
         _id: productId
     });
-    console.log(productList)
+    let userDetail = await user.findOne({
+        _id: userId
+    });
 
     res.render("cart", {
-        productName: productList.productName
+        productName: productList.productName,
+        userDetail
     })
 
 }
 
 exports.myCartHistory = async (req, res) => {
+
     let userDetail = await user.findOne({
         _id: userId
     });
@@ -369,27 +404,42 @@ exports.myCart = async (req, res) => {
             productName: req.body.productName
         })
 
-        if (!productDetail) {
-            res.send("Cart is Empty !!!")
+        let quantity = req.body.quantity;
+        let productName = req.body.productName;
+        let availableQuantity = productDetail.quantity;
+
+        if (availableQuantity >= quantity) {
+            if (!productDetail) {
+                res.send("Cart is Empty !!!")
+            } else {
+
+                const newCart = new cart({
+                    userId: userId,
+                    productId: productDetail.productId,
+                    productName: productDetail.productName,
+                    productImg: productDetail.productImg,
+                    quantity: req.body.quantity,
+                    price: productDetail.price
+
+                })
+
+                const cartDetail = await newCart.save();
+                let cartSummary = await cart.find({
+                    userId: userId
+                });
+                res.render("mycart", {
+                    cartSummary,
+                    userDetail
+                })
+            }
+
+
         } else {
-            const newCart = new cart({
-                userId: userId,
-                productId: productDetail.productId,
-                productName: productDetail.productName,
-                quantity: req.body.quantity,
-                price: productDetail.price
-
-            })
-
-            const cartDetail = await newCart.save();
-            let cartSummary = await cart.find({
-                userId: userId
-            });
-            res.render("mycart", {
-                cartSummary,
-                userDetail
-            })
+            res.send(`${quantity} ${productName} out of Stock Left only ${availableQuantity} `)
         }
+
+
+
 
 
 
@@ -417,25 +467,41 @@ exports.cartProduct = async (req, res) => {
 
     let cartId = req.body.cartId;
 
-    let updatecart = await cart.updateOne({
-        _id: cartId
-    }, {
-        $set: {
-            quantity: req.body.quantity,
-
-        }
+    let productDetail = await product.findOne({
+        productName: req.body.productName
     })
+    let quantity = req.body.quantity;
+    let productName = req.body.productName;
+    let availableQuantity = productDetail.quantity;
 
-    let cartSummary = await cart.find({});
+    if (availableQuantity >= quantity) {
+        let updatecart = await cart.updateOne({
+            _id: cartId
+        }, {
+            $set: {
+                quantity: req.body.quantity,
 
-    let userDetail = await user.findOne({
-        _id: userId
-    })
+            }
+        })
 
-    res.render("mycart", {
-        cartSummary,
-        userDetail
-    })
+        let cartSummary = await cart.find({});
+
+        let userDetail = await user.findOne({
+            _id: userId
+        })
+
+        res.render("mycart", {
+            cartSummary,
+            userDetail
+        })
+
+
+
+    } else {
+
+        res.send(`${quantity} ${productName} is out of Stock Only left ${availableQuantity}`)
+
+    }
 
 
 }
@@ -447,7 +513,7 @@ exports.cartDelete = async (req, res) => {
         _id: cartId
     });
     let cartSummary = await cart.find({});
-    console.log(cartSummary)
+
     let userDetail = await user.findOne({
         _id: userId
     })
@@ -500,6 +566,7 @@ exports.cartBuy = async (req, res) => {
                     userId: userId,
                     productId: productId,
                     productName: productName,
+                    productImg: productDetail.productImg,
                     quantity: quantity,
                     totalPrice: totalPrice
 
@@ -536,7 +603,8 @@ exports.cartBuy = async (req, res) => {
 
                 res.render("myOrder", {
                     orderSummary,
-                    userDetail
+                    userDetail,
+                    total: totalPrice
 
                 })
             } else {
@@ -556,25 +624,25 @@ exports.placeOrder = async (req, res) => {
     try {
 
         let cartProduct = await cart.find({
-            userId : userId
+            userId: userId
         });
-        console.log(cartProduct)
+
 
         let userDetail = await user.findOne({
             _id: userId
         });
 
-    
+
         for (let cart of cartProduct) {
 
             let productName = cart.productName;
             let quantity = cart.quantity;
 
             let productDetail = await product.findOne({
-              productName : productName
+                productName: productName
             });
 
-         
+
             if (!productDetail) {
                 res.send(`${productDetail.productName} Product is Not Availble `);
             } else {
@@ -591,6 +659,7 @@ exports.placeOrder = async (req, res) => {
                         userId: userId,
                         productId: productId,
                         productName: productName,
+                        productImg: productDetail.productImg,
                         quantity: quantity,
                         totalPrice: totalPrice
 
@@ -618,34 +687,32 @@ exports.placeOrder = async (req, res) => {
                         }
                     });
 
-            
+
                     let deleteCart = await cart.deleteOne({
                         _id: cart._id
                     });
 
-                    let total=0;
+                    let total = 0;
 
-                    for ( let order of orderSummary){
-                        total= total + order.totalPrice;
+                    for (let order of orderSummary) {
+                        total = total + order.totalPrice;
                     }
 
-                    res.render("myOrder", {
+                    res.render("cartOrder", {
                         orderSummary,
                         userDetail,
                         total
 
-                    } )
+                    })
                 } else {
 
-                    res.send(`${productName} Quantity ${quantity} is not available only left ${availableQuantity}`)
+                    aler(`${productName} Quantity ${quantity} is not available only left ${availableQuantity}`)
                 }
             }
         }
 
- 
+
     } catch (error) {
-       res.send(error)
+        res.send(error)
     }
 }
-
-

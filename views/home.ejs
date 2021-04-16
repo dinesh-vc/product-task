@@ -21,7 +21,12 @@
         }
     </style>
 </head>
-<h1 ALIGN="CENTER"> Welcome <%=firstName %> </h1>
+<h1 ALIGN="CENTER"> Welcome <%=userDetail.firstName %> </h1>
+<div ALIGN="CENTER">
+    <img src="data:image/PNG;base64,<%=userDetail.userImg %>" height="100px" width="100px">
+</div>
+
+
 <div ALIGN="CENTER">
 
     <form action="/sell" method="POST">
@@ -38,6 +43,7 @@
 
     <table>
         <tr>
+            <th>Product</th>
             <th>Product Name</th>
             <th>Quantity</th>
             <th>Price</th>
@@ -48,8 +54,12 @@
 
 
         </tr>
+        
         <% productList.forEach(allProducts => { %>
         <tr>
+            <td>
+                <img ALIGN="CENTER" src="data:image/PNG;base64,<%=allProducts.productImg %>" height="80px" width="80px">
+            </td>
             <td><%= allProducts.productName %></td>
             <td><%= allProducts.quantity %></td>
             <td><%= allProducts.price %></td>

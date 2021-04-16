@@ -28,6 +28,9 @@ let userSchema = new Schema({
         type: String,
         max: [100]
     },
+    userImg : {
+        type : String
+    },
     password: {
         type: String,
         required: true

@@ -16,6 +16,9 @@ let cartSchema = new Schema({
     productName: {
         type: String
     },
+    productImg: {
+        type: String
+    },
 
     quantity: {
         type: Number

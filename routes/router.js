@@ -3,7 +3,7 @@ const route = express.Router();
 
 // import controller File
 const controller = require('../Controller/controller')
-
+route.get("/" , controller.homePage)
 // get request for login and registration
 route.get("/register", controller.registerForm)
 route.get("/login", controller.loginForm)
