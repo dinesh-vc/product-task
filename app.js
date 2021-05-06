@@ -2,13 +2,14 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const multer =require ('multer')
-
-const bcrypt = require('bcrypt')
-
+require('dotenv').config();
 // Importing Model from model folder
 const user = require("./models/user");
 const product = require("./models/product")
 const order = require("./models/order");
+
+
+app.use(express.urlencoded({extended:true}));
 
 
 const ejs = require('ejs')
@@ -18,6 +19,10 @@ const host = process.env.HOST;
 
 // importing Database connection
 require('./database/connection')
+
+
+app.use('/uploads',express.static(path.join(__dirname,'/uploads')));
+
 
 
 app.use(express.json());

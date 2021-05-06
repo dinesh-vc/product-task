@@ -3,8 +3,11 @@ const product = require("../models/product")
 const order = require("../models/order");
 const cart = require("../models/cart")
 
+require('dotenv').config();
+const jwt =require("jsonwebtoken")
 const fs = require('fs')
 
+let secretKey=process.env.SecretKey
 // Import Bycrpt module for password hasing
 const bcrypt = require('bcrypt')
 let userId;
@@ -29,12 +32,15 @@ exports.login = async (req, res) => {
     try {
         let email = req.body.email;
         let password = req.body.password;
+      
 
         // checking user data in database
 
         let userInfo = await user.findOne({
             email: email
         })
+
+       
 
         if (!userInfo) {
             res.send("Please Register First !!")
@@ -49,6 +55,11 @@ exports.login = async (req, res) => {
 
 
                 let productList = await product.find({});
+
+                var token = jwt.sign( {email :userInfo.email } , secretKey , {expiresIn: '2000s'});
+
+                res.status(200).send({ auth: true, token: token });
+
                 res.render("home", {
                     productList: productList,
                     userDetail: userInfo
@@ -79,34 +90,25 @@ exports.register = async (req, res) => {
             let confirmPassword = req.body.confirmPassword;
 
             if (password === confirmPassword) {
+
                 const salt = await bcrypt.genSalt(10);
                 // now we set user password to hashed password
                 password = await bcrypt.hash(password, salt);
 
+                let profileImg = req.body.userImg;
+                
+                const userRegistration = new user({
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    phoneNumber: req.body.phoneNumber,
+                    email: req.body.email,
+                    address: req.body.address,
+                    userImg: profileImg,
+                    password: password
+                })
 
-                let profileImg = await fs.readFile(req.body.profile, function (err, data) {
-                    if (err) {
-                        throw err;
-                    } else {
-                        profileImg = data.toString('base64');
-                        img = profileImg;
-                        const userRegistration = new user({
-                            firstName: req.body.firstname,
-                            lastName: req.body.lastname,
-                            phoneNumber: req.body.phone,
-                            email: req.body.email,
-                            address: req.body.address,
-                            userImg: profileImg,
-                            password: password
-                        })
-
-                        const registred = userRegistration.save();
-                        res.render("login")
-
-                    }
-                });
-
-                console.log(img)
+                const registred = userRegistration.save();
+                res.render("login")
 
             } else {
                 res.send("Password are not matching")
@@ -137,36 +139,41 @@ exports.sell = (req, res) => {
 // Adding New Product
 exports.addProduct = async (req, res) => {
     try {
+        
+        
+        // Create a base64 string from an image => ztso+Mfuej2mPmLQxgD ...
+       
+        const base64 = fs.readFileSync(req.body.productImg, "base64");
 
-        let profileImg = await fs.readFile(req.body.productImg, async function (err, data) {
-            if (err) {
-                throw err;
-            } else {
+        // Convert base64 to buffer => <Buffer ff d8 ff db 00 43 00 ...
+        const buffer = Buffer.from(base64, "base64");
 
-                profileImg = data.toString('base64');
+        let imgPath = `./uploads/product/${req.body.productImg}`;
 
-                const newProduct = new product({
-                    userId: userId,
-                    productImg: profileImg,
-                    productName: req.body.productName,
-                    quantity: req.body.quantity,
-                    price: req.body.price,
+        fs.writeFileSync(imgPath, buffer);
 
-                })
-                const addingProduct = await newProduct.save();
-                let userInfo = user.findOne({
-                    _id: userId
-                })
+        const newProduct = new product({
+            userId: userId,
+            productImg: req.body.productImg,
+            productName: req.body.productName,
+            quantity: req.body.quantity,
+            price: req.body.price,
 
-                let productList = await product.find({});
+        })
+        const addingProduct = await newProduct.save();
 
-                res.render("home", {
-                    productList: productList,
-                    userDetail: userInfo
-                })
+        
 
-            }
+        let userInfo = await user.findOne({
+            _id : userId
+        })
+
+        let productList = await product.find({
+            userId: userId
         });
+
+        
+
 
 
     } catch (error) {
